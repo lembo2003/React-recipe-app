@@ -1,12 +1,48 @@
 import {  Search } from 'lucide-react'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import RecipeCard from '../components/RecipeCard'
+import { getRandomColor } from '../lib/utils'
+
+const API_ID=import.meta.env.VITE_APP_ID
+const API_KEY=import.meta.env.VITE_APP_KEY
 
 const HomePage = () => {
+  const [recipes, setRecipes] = useState([])
+  const [loading, setLoading] = useState(true)
+
+
+  const fetchRecipes = async (searchQuery) =>{
+    setLoading(true)
+    setRecipes([])
+    try{
+      
+      const res = await fetch(`https://api.edamam.com/api/recipes/v2/?app_id=${API_ID}&app_key=${API_KEY}&q=${searchQuery}&type=public`)
+      const data = await res.json()
+
+      setRecipes(data.hits)
+
+    }catch(err){console.log(err)}
+    finally{
+      setLoading(false)
+    }
+  }
+
+  useEffect(()=>{
+    fetchRecipes("chicken") 
+      
+    
+  },[])
+
+  const handleSearchRecipe = (e) =>{
+    e.preventDefault()
+    fetchRecipes(e.target[0].value)
+  }
+
+
   return (
     <div className='bg-[#faf9fb] p-10 flex-1'>
         <div className='max-w-screen-lg mx-auto'>
-          <form >
+          <form onSubmit={handleSearchRecipe}>
             <label htmlFor="" className='input shadow-md flex items-center gap-2'>
               <Search/>
               <input type="text" name="" id="" className='text-sm md:text-md grow' placeholder='What do you want to cook today?'/>
@@ -21,42 +57,26 @@ const HomePage = () => {
 
           <div className='grid gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3'>
             {/* 1st recipe */}
+          
+          {!loading && recipes.map(({recipe},index)=>(
+            <RecipeCard key={index} recipe={recipe}
+            {...getRandomColor()}
+            />
+          ))}
 
-                        {/* <div className='flex flex-col rounded-md bg-[#ecf7d4] overflow-hidden p-3 relative'>
-              <a href="" className='relative h-32'>
-                <img src="/1.jpg" alt="recipe img" 
-                className='rounded-md w-full h-full object-cover cursor-pointer'/>
-                <div className='absolute bottom-2 left-2 bg-white rounded-full p-1 cursor-pointer flex items-center
-                gap-1 text-sm '>
-                  <Soup size={16}/> 4 Servings 
-                </div>
-                <div className='absolute top-1 right-2 bg-white rounded-full p-1 cursor-pointer'>
-                  <Heart size={20} className='hover:fill-red-500 hover:text-red-500'/>
-                </div>
-              </a>
 
-              <div className='flex mt-1'>
-                <p className='font-bold tracking-wide'>Roasted Chicken</p>
-              </div>
-              <p className='my-2'>Turkish Kitchen</p>
-
-              <div className='flex gap-2 mt-auto'>
-                <div className='flex gap-1 bg-[#d6f497] items-center p-1 rounded-md'>
-                  <HeartPulse size={16}/>
-                  <span className='text-sm tracking-tighter font-semibold'>Gluten-free</span>
-                </div>
-                <div className='flex gap-1 bg-[#d6f497] items-center p-1 rounded-md'>
-                  <HeartPulse size={16}/>
-                  <span className='text-sm tracking-tighter font-semibold'>Heart-healthy</span>
-                </div>
-              </div>
-            </div> */}
-            <RecipeCard />
-            <RecipeCard />
-            <RecipeCard />
-            <RecipeCard />
-            <RecipeCard />
-            <RecipeCard />
+					{loading &&
+						[...Array(9)].map((_, index) => (
+							<div key={index} className='flex flex-col gap-4 w-full'>
+								<div className='skeleton h-32 w-full'></div>
+								<div className='flex justify-between'>
+									<div className='skeleton h-4 w-28'></div>
+									<div className='skeleton h-4 w-24'></div>
+								</div>
+								<div className='skeleton h-4 w-1/2'></div>
+							</div>
+						))}
+              
 
 
 
