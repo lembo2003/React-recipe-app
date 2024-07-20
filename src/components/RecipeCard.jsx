@@ -7,6 +7,7 @@ const getTwoValuesFromArray = (arr) => {
 
 const RecipeCard = ({ recipe, bg, badge }) => {
 	const healthLabels = getTwoValuesFromArray(recipe.healthLabels);
+	const encodedLabel = encodeURIComponent(recipe.label);
 	const [isFavorite, setIsFavorite] = useState(localStorage.getItem("favorites")?.includes(recipe.label));
 
 	const addRecipeToFavorites = () => {
@@ -27,7 +28,7 @@ const RecipeCard = ({ recipe, bg, badge }) => {
 	return (
 		<div className={`flex flex-col rounded-md ${bg} overflow-hidden p-3 relative`}>
 			<a
-				href={`https://www.youtube.com/results?search_query=${recipe.label} recipe`}
+				href={`https://www.youtube.com/results?search_query=${encodedLabel} recipe`}
 				target='_blank'
 				className='relative h-32'
 			>
